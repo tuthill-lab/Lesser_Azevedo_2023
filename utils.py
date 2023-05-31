@@ -634,7 +634,238 @@ def desc_sens_local_etc_cmap():
     colors = ["#95d0fc","#90e4c1","#916e99","#069af3","#d8dcd6"]
     cmap = sns.set_palette(sns.color_palette(colors))
     return cmap
-    
+
+def make_json(seg_ids=None, hidden_ids=None,name="published FANC neurons"):
+    json_str = {
+        "layers": [
+            {
+            "source": "precomputed://gs://zetta_lee_fly_vnc_001_precomputed/fanc_v4_em",
+            "type": "image",
+            "blend": "default",
+            "shaderControls": {},
+            "name": "FANCv4"
+            },
+            {
+            "source": "graphene://https://cave.fanc-fly.com/segmentation/table/mar2021_prod",
+            "type": "segmentation_with_graph",
+            "colorSeed": 1792288153,
+            "segments": seg_ids,
+            "skeletonRendering": {
+                "mode2d": "lines_and_points",
+                "mode3d": "lines"
+            },
+            "graphOperationMarker": [
+                {
+                "annotations": [],
+                "tags": []
+                },
+                {
+                "annotations": [],
+                "tags": []
+                }
+            ],
+            "pathFinder": {
+                "color": "#ffff00",
+                "pathObject": {
+                "annotationPath": {
+                    "annotations": [],
+                    "tags": []
+                },
+                "hasPath": False
+                }
+            },
+            "name": name #"seg_Mar2021_proofreading"
+            },
+            {
+            "type": "segmentation",
+            "mesh": "precomputed://gs://zetta_lee_fly_vnc_001_precomputed/vnc1_full_v3align_2/brain_regions",
+            "objectAlpha": 0.1,
+            "hideSegmentZero": False,
+            "ignoreSegmentInteractions": True,
+            "segmentColors": {
+                "1": "#bfbfbf",
+                "2": "#d343d6"
+            },
+            "segments": [
+                "1",
+                "2"
+            ],
+            "skeletonRendering": {
+                "mode2d": "lines_and_points",
+                "mode3d": "lines"
+            },
+            "name": "volume outlines"
+            }
+        ],
+        "navigation": {
+            "pose": {
+            "position": {
+                "voxelSize": [
+                4.300000190734863,
+                4.300000190734863,
+                45
+                ],
+                "voxelCoordinates": [
+                    32476.95703125,
+                    99454.96875,
+                    1891.22607421875
+                ]
+            }
+            },
+            "zoomFactor": 14.975854772570637
+        },
+        "perspectiveOrientation": [
+            0.0034316908568143845,
+            -0.0034852433018386364,
+            0.0022593876346945763,
+            0.9999854564666748
+        ],
+        "perspectiveZoom": 4317,
+        "showSlices": False,
+        "gpuMemoryLimit": 4000000000,
+        "systemMemoryLimit": 4000000000,
+        "concurrentDownloads": 64,
+        "jsonStateServer": "https://global.daf-apis.com/nglstate/api/v1/post",
+        "selectedLayer": {
+            "layer": "seg_Mar2021_proofreading",
+            "visible": True
+        },
+        "layout": "xy-3d"
+    }
+    return json_str
+
+# {
+#   "layers": [
+#     {
+#       "source": "precomputed://gs://zetta_lee_fly_vnc_001_precomputed/fanc_v4_em",
+#       "type": "image",
+#       "blend": "default",
+#       "shaderControls": {},
+#       "name": "FANCv4"
+#     },
+#     {
+#       "source": "graphene://https://cave.fanc-fly.com/segmentation/table/mar2021_prod",
+#       "type": "segmentation_with_graph",
+#       "colorSeed": 1792288153,
+#       "segmentColors": {
+#         "648518346484097831": "#ff3737",
+#         "648518346494281192": "#28e1ff",
+#         "648518346486744291": "#7dff7d",
+#         "648518346484474627": "#7dff7d",
+#         "648518346506877256": "#2dfff5",
+#         "648518346490510589": "#7d7dff",
+#         "648518346496552962": "#37c337",
+#         "648518346493943072": "#7dff7d",
+#         "648518346497547510": "#0a9b0a",
+#         "648518346499753100": "#1effff",
+#         "648518346473993325": "#ff7d7d",
+#         "648518346486525133": "#ffa01e",
+#         "648518346496651309": "#ff7d7d",
+#         "648518346494755506": "#ffb40a",
+#         "648518346498254576": "#1fe0f9",
+#         "648518346495911014": "#37c337",
+#         "648518346493717646": "#19d4f5",
+#         "648518346483133092": "#32e6ff",
+#         "648518346497452278": "#19dff5",
+#         "648518346513752089": "#ff9100",
+#         "648518346486075538": "#0a9b0a",
+#         "648518346493057308": "#ffc832",
+#         "648518346502925179": "#0a9b0a",
+#         "648518346520152913": "#37ff37",
+#         "648518346477819093": "#7d7dff",
+#         "648518346488315887": "#0ff5d7",
+#         "648518346493664248": "#7dff7d"
+#       },
+#       "segments": [
+#         "648518346487932496"
+#       ],
+#       "skeletonRendering": {
+#         "mode2d": "lines_and_points",
+#         "mode3d": "lines"
+#       },
+#       "graphOperationMarker": [
+#         {
+#           "annotations": [],
+#           "tags": []
+#         },
+#         {
+#           "annotations": [],
+#           "tags": []
+#         }
+#       ],
+#       "pathFinder": {
+#         "color": "#ffff00",
+#         "pathObject": {
+#           "annotationPath": {
+#             "annotations": [],
+#             "tags": []
+#           },
+#           "hasPath": false
+#         }
+#       },
+#       "name": "seg_Mar2021_proofreading"
+#     },
+#     {
+#       "source": "precomputed://gs://lee-lab_female-adult-nerve-cord/alignmentV4/synapses/postsynapses_May2021",
+#       "type": "image",
+#       "blend": "default",
+#       "shader": "void main() { emitRGBA(vec4(1, 0, 1, toNormalized(getDataValue()))); }",
+#       "shaderControls": {},
+#       "name": "synapses_May2021",
+#       "visible": false
+#     },
+#     {
+#       "type": "segmentation",
+#       "mesh": "precomputed://gs://zetta_lee_fly_vnc_001_precomputed/vnc1_full_v3align_2/brain_regions",
+#       "objectAlpha": 0.1,
+#       "hideSegmentZero": false,
+#       "ignoreSegmentInteractions": true,
+#       "segmentColors": {
+#         "1": "#bfbfbf",
+#         "2": "#d343d6"
+#       },
+#       "segments": [
+#         "1",
+#         "2"
+#       ],
+#       "skeletonRendering": {
+#         "mode2d": "lines_and_points",
+#         "mode3d": "lines"
+#       },
+#       "name": "volume outlines"
+#     }
+#   ],
+#   "navigation": {
+#     "pose": {
+#       "position": {
+#         "voxelSize": [
+#           4.300000190734863,
+#           4.300000190734863,
+#           45
+#         ],
+#         "voxelCoordinates": [
+#           38488,
+#           119558,
+#           603
+#         ]
+#       }
+#     },
+#     "zoomFactor": 110.65743104396275
+#   },
+#   "showDefaultAnnotations": false,
+#   "perspectiveZoom": 4317.621930475839,
+#   "showSlices": false,
+#   "gpuMemoryLimit": 4000000000,
+#   "systemMemoryLimit": 4000000000,
+#   "concurrentDownloads": 64,
+#   "jsonStateServer": "https://global.daf-apis.com/nglstate/api/v1/post",
+#   "selectedLayer": {
+#     "layer": "seg_Mar2021_proofreading",
+#     "visible": true
+#   },
+#   "layout": "3d"
+# }
+
 def black_parula():
     # 0.2422, 0.1504, 0.6603
     cm_data = [[0.0, 0.0, 0.0],

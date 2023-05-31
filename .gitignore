@@ -161,3 +161,4 @@ cython_debug/
 
 dfs_saved/*
 dfs_pre_to_mn/*
+figpanels/*
