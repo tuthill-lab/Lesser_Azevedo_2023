@@ -2,21 +2,30 @@ import utils
 import pandas as pd
 import numpy as np
 import datetime as dt
+from zoneinfo import ZoneInfo
 import calendar
+import os
+
+pre_to_mn_path = os.path.join('.','dfs_pre_to_mn')
+
 
 if __name__ == '__main__':
     pass
 
-ts = dt.datetime.utctimetuple(dt.datetime.utcnow())
-timestamp = dt.datetime(ts[0],ts[1],ts[2])
-timestamp = dt.datetime.fromtimestamp(1684915801.222989)
-timestamp = dt.datetime(2023, 5, 25, 8, 10, 1, 254304, tzinfo=dt.timezone.utc) # v 604 for the paper
+
+ts = dt.datetime.timetuple(dt.datetime.now(tz=ZoneInfo("America/Los_Angeles")))
+timestamp = dt.datetime(ts[0],ts[1],ts[2],ts[3],tzinfo=ZoneInfo("America/Los_Angeles"))
+
+timestamp = dt.datetime(2024, 1, 17, 8, 10, 1, 179472, tzinfo=ZoneInfo("America/Los_Angeles")) # v840 for the paper
+                            #   dt.datetime(2023, 5, 25, 8, 10, 1, 254304, tzinfo=dt.timezone.utc) # v 604 for the preprint
 
 print('query timestamp: {} ({})'.format(timestamp,timestamp.timestamp()))
 
 def get_timestamp():
     return timestamp
 
+def get_yesterday():
+    return dt.datetime(ts[0],ts[1],ts[2],ts[3],tzinfo=ZoneInfo("America/Los_Angeles")) - dt.timedelta(days=1)
 
 def left_pre_to_mn_df(client):
     t1_mns_df = client.materialize.query_table('motor_neuron_table_v7',timestamp=timestamp)
@@ -38,6 +47,30 @@ def get_unduplicated_sensory_axon_table(client):
 
     hair_plates = client.materialize.query_table('hair_plate_table',timestamp=timestamp)
     all_sensory = pd.concat([sensory_axons,hair_plates],    axis=0,    join="outer",    ignore_index=False,    keys=None,    levels=None,    names=None,    verify_integrity=False,    copy=True,)
+    all_sensory = all_sensory.loc[~all_sensory.duplicated(keep='first',subset=['pt_root_id'])]
+    return all_sensory
+
+def get_unduplicated_sensory_axon_table_now(client):
+    sensory_axons = client.materialize.query_table('nerve_bundle_fibers_v0')
+    # sort to put "unsure" cell type at the bottom, then select the unduplicated
+    sensory_axons = sensory_axons.sort_values('cell_type',ascending=True).loc[~sensory_axons.duplicated(keep='first',subset=['pt_root_id'])]
+    sensory_axons = sensory_axons.loc[sensory_axons.pt_root_id>0]
+
+    hair_plates = client.materialize.query_table('hair_plate_table')
+    all_sensory = pd.concat([sensory_axons,hair_plates],    axis=0,    join="outer",    ignore_index=False,    keys=None,    levels=None,    names=None,    verify_integrity=False,    copy=True,)
+    all_sensory = all_sensory.loc[~all_sensory.duplicated(keep='first',subset=['pt_root_id'])]
+    return all_sensory
+
+def get_live_sensory_axon_table(client):
+    # sensory_axons = client.materialize.query_table('nerve_bundle_fibers_v0',timestamp=timestamp)
+    sensory_axons = client.materialize.live_live_query('nerve_bundle_fibers_v0',timestamp='now')
+    # sort to put "unsure" cell type at the bottom, then select the unduplicated
+    sensory_axons = sensory_axons.sort_values('cell_type',ascending=True).loc[~sensory_axons.duplicated(keep='first',subset=['pt_root_id'])]
+    sensory_axons = sensory_axons.loc[sensory_axons.pt_root_id>0]
+
+    # hair_plates = client.materialize.query_table('hair_plate_table',timestamp=timestamp)
+    hair_plates = client.materialize.live_live_query('hair_plate_table',timestamp='now')
+    all_sensory = pd.concat([sensory_axons,hair_plates],    axis=0,    join="outer",    ignore_index=False,    keys=None,    levels=None,    names=None,    verify_integrity=False,    copy=True,)
     # all_sensory = all_sensory[['pt_root_id','classification_system','cell_type']]
     # all_sensory = all_sensory.rename({'pt_root_id':'segID'},axis=1)
     all_sensory = all_sensory.loc[~all_sensory.duplicated(keep='first',subset=['pt_root_id'])]
@@ -49,7 +82,7 @@ def load_or_create_pre_to_mn_df(client=None,from_pickle=True):
     name = 'pre_to_mn_df'
     today = dt.date.today()
     d1 = today.strftime("%Y%m%d")
-    fn = './dfs_pre_to_mn/' + name + '_' + d1 + '.pkl'
+    fn = pre_to_mn_path + os.sep + name + '_' + d1 + '.pkl'
     try:
         pre_to_mn_df = pd.read_pickle(fn)
     except FileNotFoundError:
@@ -71,7 +104,7 @@ def load_pre_to_mn_df(ext=''):
         name = 'pre_to_mn_df' + '_' + ext
     today = dt.date.today()
     d1 = today.strftime("%Y%m%d")
-    fn = './dfs_pre_to_mn/' + name + '_' + d1 + '.pkl'
+    fn = pre_to_mn_path + os.sep + name + '_' + d1 + '.pkl'
     try:
         pre_to_mn_df = pd.read_pickle(fn)    
     except FileNotFoundError:
@@ -92,7 +125,7 @@ def load_old_pre_to_mn_df(ext=''):
         b=b+1
         yday = today - dt.timedelta(days=b)
         d1 = yday.strftime("%Y%m%d")
-        fn = './dfs_pre_to_mn/' + name + '_' + d1 + '.pkl'
+        fn = pre_to_mn_path + os.sep + name + '_' + d1 + '.pkl'
         try:
             pre_to_mn_df = pd.read_pickle(fn)
             fnfe=False
@@ -122,20 +155,6 @@ def load_pre_to_df(ext=''):
     print('Found pickle file {}'.format(fn))
     return pre_to_df 
 
-def load_pre_of_df(ext=''):
-    name = 'pre_of_df'
-    if ext != '':
-        name = 'pre_of_df' + '_' + ext
-    today = dt.date.today()
-    d1 = today.strftime("%Y%m%d")
-    fn = './dfs_pre_of_/' + name + '_' + d1 + '.pkl'
-    try:
-        pre_to_df = pd.read_pickle(fn)    
-    except FileNotFoundError:
-        print('No pickle found, trying to load old {}'.format(ext))
-        pre_to_df,fn = load_old_pre_of_df(ext=ext)
-    print('Found pickle file {}'.format(fn))
-    return pre_to_df 
 
 def load_old_pre_to_df(ext=''):
     name = 'pre_to_df'
@@ -162,13 +181,53 @@ def load_old_pre_to_df(ext=''):
         print('Found pickle file {}'.format(fn))
         return pre_to_df,fn 
 
+def load_pre_of_df(ext=''):
+    name = 'pre_of_df'
+    if ext != '':
+        name = 'pre_of_df' + '_' + ext
+    today = dt.date.today()
+    d1 = today.strftime("%Y%m%d")
+    fn = './dfs_pre_of_/' + name + '_' + d1 + '.pkl'
+    try:
+        pre_to_df = pd.read_pickle(fn)    
+    except FileNotFoundError:
+        print('No pickle found, trying to load old {}'.format(ext))
+        pre_to_df,fn = load_old_pre_of_df(ext=ext)
+    print('Found pickle file {}'.format(fn))
+    return pre_to_df 
+
+def load_old_pre_of_df(ext=''):
+    name = 'pre_of_df'
+    if ext != '':
+        name = 'pre_of_df' + '_' + ext
+    today = dt.date.today()
+    b=0
+    fnfe = False
+    while b<10:
+        b=b+1
+        yday = today - dt.timedelta(days=b)
+        d1 = yday.strftime("%Y%m%d")
+        fn = './dfs_pre_of_/' + name + '_' + d1 + '.pkl'
+        try:
+            pre_to_df = pd.read_pickle(fn)
+            fnfe=False
+            break
+        except FileNotFoundError:
+            fnfe=True
+    if fnfe:
+        print('No pickle found')
+        raise(FileNotFoundError)
+    else:        
+        print('Found pickle file {}'.format(fn))
+        return pre_to_df,fn 
+
 def save_pre_to_mn_df(temp_df,ext=''):
     name = 'pre_to_mn_df'
     if ext != '':
         name = 'pre_to_mn_df' + '_' + ext
     today = dt.date.today()
     d1 = today.strftime("%Y%m%d")
-    fn = './dfs_pre_to_mn/' + name + '_' + d1 + '.pkl'
+    fn = pre_to_mn_path + os.sep + name + '_' + d1 + '.pkl'
     temp_df.to_pickle(fn)
     print(fn)
     print(temp_df.shape)
@@ -316,6 +375,7 @@ def create_pre_to_mn_df(client,mn_index,soma_table,neckns_df,all_sensory,sides=[
 
     mn_index = pre_to_mn_df.columns           
     return pre_to_mn_df, mn_index
+
 
 
     # Given a dataframe of inputs, df, and a lower bound on the number of connections to keep

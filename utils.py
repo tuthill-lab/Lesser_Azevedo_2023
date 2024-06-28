@@ -370,21 +370,137 @@ def get_motor_pool_tuple_dict():
         'tarsus_depressor_noid_B':              ('L', 'Leg', 'tibia', 'unknown', 'tarsus_unidentified', ['A1','A2',], All),
         'tarsus_depressor_noid_B1':             ('L', 'Leg', 'tibia', 'unknown', 'tarsus_unidentified', ['A1','A2',], All),        
         'tarsus_depressor_noid_B2':             ('L', 'Leg', 'tibia', 'unknown', 'tarsus_unidentified', ['A2',], All),        
-        'tarsus_depressor_noid_E':              ('L', 'Leg', 'tibia', 'unknown', 'tarsus_unidentified', ['E'], All),       
+        'tarsus_depressor_noid_E':              ('L', 'Leg', 'tibia', 'unknown', 'tarsus_unidentified', ['E'], All),
+
+
+        'coxa_anterior':            ('L',All, 'thorax', 'swing', ['tergopleural_promotor_pleural_promotor_miller_28_30','sternal_anterior_rotator_miller_31','sternal_adductor_miller_miller_in_thorax_miller_33'], All,All),           
+        'coxa_promote':             ('L', 'Dorsal', 'thorax', 'swing', 'tergopleural_promotor_pleural_promotor_miller_28_30', All,All),
+        'coxa_rotate_adduct':       ('L',All, 'thorax', 'swing', ['sternal_anterior_rotator_miller_31','sternal_adductor_miller_miller_in_thorax_miller_33'], All,All),
+        'coxa_posterior':           ('L','Accessory', 'thorax', 'stance', ['sternal_posterior_rotator_miller_32','pleural_remotor_and_abductor_miller_29'], All,All),
+        'trochanter_extend':        ('L',All, ['thorax','coxa'], 'extend', ['tergotrochanter','extracoxal_trochanter_depressor','trochanter_extensor'], All,All),
+        'trochanter_flex':          ('L', All, 'coxa', 'flex', ['trochanter_flexor','trochanter_promotor'], All, All),
+        'femur_reduct':             ('L', 'Leg', 'trochanter', 'reductor', 'femur_reductor', All, All),
+        'tibia_extend':             ('L', 'Leg', 'femur', 'extend', 'tibia_extensor', ['seti','feti'], All),
+        'tibia_ta_flex_A':          ('L', 'Leg', ['femur','tibia'], ['flex','unknown'], ['main_tibia_flexor','auxiliary_tibia_flexor', 'tarsus_unidentified'], ['0','1','2','3','4','Bslow'], All),  #('L', 'Leg', 'femur', 'flex', 'main_tibia_flexor', All, All),,
+        'tibia_ta_flex_B':          ('L', 'Leg', ['femur','tibia'], ['flex','unknown'], ['auxiliary_tibia_flexor','tarsus_unidentified'], ['A1','A2'], All),
+        'tibia_ta_flex_C':          ('L', 'Leg', ['femur','tibia'], ['flex','unknown'], ['auxiliary_tibia_flexor','tarsus_unidentified'], ['E'], All),
+        'ltm_A':                    ('L', 'Leg', 'ltm', 'claw', 'ltm', ['tiny'], All),
+        'ltm_B':                    ('L', 'Leg', 'ltm', 'claw', 'ltm', ['small','large'], All),
+        'tarsus_depress_medial':    ('L', 'Leg', 'tibia', 'flex', 'tarsus_depressor', ['medial'], All),
+        'tarsus_depress_ventralU':  ('L', 'Leg', 'tibia', 'flex', 'tarsus_depressor', ['ventralU'], All),       
+        'ltm_ta_dipalpha':          ('L', 'Leg', ['ltm','tibia'], ['claw','flex'], ['ltm','tarsus_depressor'], ['tiny','ventralU'], All),
     }
 
     return motor_pool_tuple_dict
 
-def get_right_motor_pool_tuple_dict():
-    r_muscle_tuple_dict = get_motor_pool_tuple_dict()
-    for key in r_muscle_tuple_dict.keys():
-        val = r_muscle_tuple_dict[key]
-        listA = list(val)
-        listA[0] = 'R'
-        r_muscle_tuple_dict[key] = tuple(listA)
-        
-    return r_muscle_tuple_dict
+def simple_motor_pool_dict_map():
+    motor_pool_tuple_dict = {
+        'coxa_promote':'coxa_promote',
+        'coxa_rotate_adduct':'coxa_rotate_adduct',
+        'coxa_posterior':'coxa_posterior',
+        'trochanter_extend':'trochanter_extend',
+        'trochanter_flex':'trochanter_flex',
+        'femur_reduct':'femur_reduct',
+        'tibia_extend':'tibia_extend',
+        'tibia_ta_flex_A':'tibia_ta_flex_A',
+        'tibia_ta_flex_B':'tibia_ta_flex_B',
+        'tibia_ta_flex_C':'tibia_ta_flex_C',
+        'ltm_A':'ltm_A',
+        'ltm_B':'ltm_B',
+        'tarsus_depressor_medial':'tarsus_depressor_medial',
+        'tarsus_depressor_ventralU':'tarsus_depressor_ventralU',
+    }
+    return motor_pool_tuple_dict
 
+def ta_assigned_pools_coxa_ab():
+    pool_keys = [
+        # 'coxa_anterior',
+        'coxa_promote',
+        'coxa_rotate_adduct',
+        'coxa_posterior',
+        'trochanter_extend',
+        'trochanter_flex',
+        'femur_reduct',
+        'tibia_extend',
+        'tibia_ta_flex_A',
+        'tibia_ta_flex_B',
+        'tibia_ta_flex_C',
+        'ltm_A',
+        'ltm_B',
+        'tarsus_depress_medial',
+        'tarsus_depress_ventralU',
+    ]
+    return pool_keys
+
+def ta_assigned_pools():
+    pool_keys = [
+        'coxa_anterior',
+        'coxa_posterior',
+        'trochanter_extend',
+        'trochanter_flex',
+        'femur_reduct',
+        'tibia_extend',
+        'tibia_ta_flex_A',
+        'tibia_ta_flex_B',
+        'tibia_ta_flex_C',
+        'ltm_A',
+        'ltm_B',
+        'tarsus_depressor_medial',
+        'tarsus_depressor_ventralU',
+    ]
+    return pool_keys
+
+def ta_assigned_morpho_pools():
+    pool_keys = [
+        'coxa_anterior',
+        'coxa_posterior',
+        'trochanter_extend',
+        'trochanter_flex',
+        'femur_reduct',
+        'tibia_extend',
+        'tibia_ta_flex_A',
+        'tibia_ta_flex_B',
+        'tibia_ta_flex_C',
+        'ltm_ta_dipalpha', # includes the ventral neuron
+        'ltm_B',
+        'tarsus_depressor_medial',
+    ]
+    return pool_keys
+
+def pool_palette():
+    cat_pal = {
+        'coxa_anterior': '#CC8544',
+        'coxa_promote': '#F47A00',
+        'coxa_rotate_adduct': '#F0A968',
+
+        'coxa_posterior': '#00A2B4',
+        'trochanter_extend': '#D5CB6C',
+        'trochanter_flex': '#3F42A2',
+        'femur_reduct': '#FF0000',
+        'tibia_extend': '#CC8544',
+
+        'tibia_flex_A': '#2E3191',
+        'tibia_flex_B': '#2DB515',
+        'tibia_flex_C': '#156005',
+        'tibia_ta_flex_A': '#2E3191',
+        'tibia_ta_flex_B': '#2DB515',
+        'tibia_ta_flex_C': '#156005',
+        
+        'ltm_A': '#FFF155',
+        'ltm_B': '#FFF100',
+        'ltm_ta_dipalpha': '#FFF155',
+
+        'tarsus_depressor_medial': '#2E31FF', 
+        'tarsus_depressor_ventralU': '#2E3133',
+        'tarsus_depressor_med_venU': '#CECECE',
+
+        'tarsus_depressor_noid': '#CECECE',
+        'tarsus_depressor_A': '#CECECE',
+        'tarsus_depressor_B': '#CECECE',
+        'tarsus_levator_C': '#CECECE',
+        
+    }
+    return cat_pal
 
 def sort_segment_fcn_index(col_idx,muscle_tuple_dict =get_motor_pool_tuple_dict()):
     # If you sort the index according to number of inputs first, then run this code, it should order the thing by seg and fcn, then by inputs
